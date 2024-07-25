@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  juice-shop:
+    image: bkimminich/juice-shop
+    ports:
+      - "3000:3000"
+
+  zap:
+    image: owasp/zap2docker-stable
+    command: >
+      zap.sh -daemon -port 8080 -host 0.0.0.0
+             -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true
+             -config api.key=${ZAP_API_KEY}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - juice-shop
+    environment:
+      - ZAP_API_KEY=${ZAP_API_KEY}
+
+  defect-dojo:
+    image: defectdojo/defectdojo-django
+    ports:
+      - "8000:8000"
+    environment:
+      DD_DATABASE_ENGINE: django.db.backends.postgresql
+      DD_DATABASE_HOST: db
+      DD_DATABASE_PORT: 5432
+      DD_DATABASE_NAME: ${DD_DATABASE_NAME}
+      DD_DATABASE_USER: ${DD_DATABASE_USER}
+      DD_DATABASE_PASSWORD: ${DD_DATABASE_PASSWORD}
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: ${DD_DATABASE_NAME}
+      POSTGRES_USER: ${DD_DATABASE_USER}
+      POSTGRES_PASSWORD: ${DD_DATABASE_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
