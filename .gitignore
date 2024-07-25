@@ -27,3 +27,6 @@ venv/
 ENV/
 env/
 .venv/
+
+# VS/VSCode Stuff
+.vscode/
