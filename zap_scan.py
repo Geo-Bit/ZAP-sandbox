@@ -5,7 +5,8 @@ from zapv2 import ZAPv2
 target = 'http://juice-shop:3000'
 api_key = os.getenv('ZAP_API_KEY')
 
-zap = ZAPv2(apikey=api_key, proxies={'http': 'http://localhost:8080', 'https': 'http://localhost:8080'})
+zap = ZAPv2(apikey=api_key, proxies={
+            'http': 'http://localhost:8080', 'https': 'http://localhost:8080'})
 
 print(f'Accessing target {target}')
 zap.urlopen(target)
